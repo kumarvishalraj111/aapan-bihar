@@ -183,48 +183,49 @@ export default function Home() {
       if (!window.YT?.Player) return;
       if (playerRef.current) return;
 
-      playerRef.current = new window.YT.Player(
-        hostRef.current,
-        {
-          width: "1",
-          height: "1",
+      playerRef.current =
+        new window.YT.Player(
+          hostRef.current,
+          {
+            width: "1",
+            height: "1",
 
-          playerVars: {
-            listType: "playlist",
-            list: PLAYLIST_ID,
-            autoplay: 0,
-            controls: 0,
-            playsinline: 1,
-          },
-
-          events: {
-            onReady() {
-              setReady(true);
-              updateInfo();
+            playerVars: {
+              listType: "playlist",
+              list: PLAYLIST_ID,
+              autoplay: 0,
+              controls: 0,
+              playsinline: 1,
             },
 
-            onStateChange(event: any) {
-              if (
-                event.data ===
-                window.YT.PlayerState.PLAYING
-              ) {
-                setPlaying(true);
-              } else {
-                setPlaying(false);
-              }
+            events: {
+              onReady() {
+                setReady(true);
+                updateInfo();
+              },
 
-              updateInfo();
-            },
+              onStateChange(event: any) {
+                if (
+                  event.data ===
+                  window.YT.PlayerState.PLAYING
+                ) {
+                  setPlaying(true);
+                } else {
+                  setPlaying(false);
+                }
 
-            onError(event: any) {
-              console.log(
-                "YouTube error:",
-                event.data
-              );
+                updateInfo();
+              },
+
+              onError(event: any) {
+                console.log(
+                  "YouTube error:",
+                  event.data
+                );
+              },
             },
-          },
-        }
-      );
+          }
+        );
     }
 
     if (window.YT?.Player) {
@@ -372,10 +373,6 @@ export default function Home() {
           BACKGROUND +
           ")",
 
-        /*
-         * Desktop untouched.
-         * Mobile: पूरा background दिखेगा.
-         */
         backgroundSize: isMobile
           ? "100% 100%"
           : "cover",
@@ -605,35 +602,19 @@ export default function Home() {
               textAlign: "center",
 
               fontSize: isMobile
-                ? "8px"
-                : "11px",
-
-              fontWeight: 700,
-
-              opacity: 0.9,
-            }}
-          >
-            🪔 छठ पूजा 2026
-          </div>
-
-          <div
-            style={{
-              textAlign: "center",
-
-              fontSize: isMobile
-                ? "9px"
-                : "13px",
+                ? "12px"
+                : "15px",
 
               fontWeight: 800,
 
-              marginTop: "2px",
+              opacity: 0.95,
 
               marginBottom: isMobile
-                ? "4px"
-                : "7px",
+                ? "7px"
+                : "9px",
             }}
           >
-            नहाय-खाय शुरू होने में
+            🪔 छठ पूजा 2026
           </div>
 
           <div
@@ -644,8 +625,8 @@ export default function Home() {
                 "repeat(4,1fr)",
 
               gap: isMobile
-                ? "2px"
-                : "4px",
+                ? "3px"
+                : "5px",
             }}
           >
             <CountdownBox
@@ -671,24 +652,6 @@ export default function Home() {
               label="सेकंड"
               small={isMobile}
             />
-          </div>
-
-          <div
-            style={{
-              textAlign: "center",
-
-              marginTop: isMobile
-                ? "3px"
-                : "6px",
-
-              fontSize: isMobile
-                ? "5px"
-                : "8px",
-
-              opacity: 0.65,
-            }}
-          >
-            13 नवंबर 2026 • नहाय-खाय
           </div>
         </section>
 
@@ -866,7 +829,6 @@ export default function Home() {
 
       {/* =========================
           ADD SUGGESTIONS
-          MOBILE BOTTOM RIGHT
       ========================= */}
 
       <a
@@ -1226,7 +1188,6 @@ export default function Home() {
 
       {/* =========================
           CREDIT
-          MOBILE BOTTOM LEFT
       ========================= */}
 
       <div
@@ -1343,8 +1304,6 @@ export default function Home() {
         }
 
         @media (max-width: 380px) {
-          /* Very small phones */
-
           h1 {
             padding-top: 65px !important;
           }
