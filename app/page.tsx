@@ -10,7 +10,9 @@ declare global {
 }
 
 const PLAYLIST_ID = "PLGeZBZvchIWA";
+
 const BACKGROUND = "/background.png";
+
 const COVER =
   "https://www.apnabihar.xyz/covers/GZKPkb5dUsI.jpg";
 
@@ -61,22 +63,17 @@ export default function Home() {
     "Kalpana Patowary"
   );
 
-  const [currentTime, setCurrentTime] =
-    useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
-  const [duration, setDuration] =
-    useState(0);
+  const [countdown, setCountdown] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
-  const [countdown, setCountdown] =
-    useState({
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-    });
-
-  const [isMobile, setIsMobile] =
-    useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   /* =========================
      SCREEN SIZE
@@ -84,23 +81,15 @@ export default function Home() {
 
   useEffect(() => {
     function checkScreen() {
-      setIsMobile(
-        window.innerWidth <= 700
-      );
+      setIsMobile(window.innerWidth <= 700);
     }
 
     checkScreen();
 
-    window.addEventListener(
-      "resize",
-      checkScreen
-    );
+    window.addEventListener("resize", checkScreen);
 
     return () => {
-      window.removeEventListener(
-        "resize",
-        checkScreen
-      );
+      window.removeEventListener("resize", checkScreen);
     };
   }, []);
 
@@ -110,8 +99,7 @@ export default function Home() {
 
   useEffect(() => {
     function updateCountdown() {
-      const difference =
-        CHHATH_START - Date.now();
+      const difference = CHHATH_START - Date.now();
 
       if (difference <= 0) {
         setCountdown({
@@ -124,30 +112,23 @@ export default function Home() {
         return;
       }
 
-      const totalSeconds =
-        Math.floor(
-          difference / 1000
-        );
+      const totalSeconds = Math.floor(
+        difference / 1000
+      );
 
-      const days =
-        Math.floor(
-          totalSeconds / 86400
-        );
+      const days = Math.floor(
+        totalSeconds / 86400
+      );
 
-      const hours =
-        Math.floor(
-          (totalSeconds % 86400) /
-            3600
-        );
+      const hours = Math.floor(
+        (totalSeconds % 86400) / 3600
+      );
 
-      const minutes =
-        Math.floor(
-          (totalSeconds % 3600) /
-            60
-        );
+      const minutes = Math.floor(
+        (totalSeconds % 3600) / 60
+      );
 
-      const seconds =
-        totalSeconds % 60;
+      const seconds = totalSeconds % 60;
 
       setCountdown({
         days,
@@ -159,11 +140,10 @@ export default function Home() {
 
     updateCountdown();
 
-    const timer =
-      window.setInterval(
-        updateCountdown,
-        1000
-      );
+    const timer = window.setInterval(
+      updateCountdown,
+      1000
+    );
 
     return () => {
       window.clearInterval(timer);
@@ -235,13 +215,10 @@ export default function Home() {
                 updateInfo();
               },
 
-              onStateChange(
-                event: any
-              ) {
+              onStateChange(event: any) {
                 if (
                   event.data ===
-                  window.YT.PlayerState
-                    .PLAYING
+                  window.YT.PlayerState.PLAYING
                 ) {
                   setPlaying(true);
                 } else {
@@ -275,18 +252,14 @@ export default function Home() {
 
       if (!existing) {
         const script =
-          document.createElement(
-            "script"
-          );
+          document.createElement("script");
 
         script.src =
           "https://www.youtube.com/iframe_api";
 
         script.async = true;
 
-        document.body.appendChild(
-          script
-        );
+        document.body.appendChild(script);
       }
     }
 
@@ -303,9 +276,7 @@ export default function Home() {
           const total =
             playerRef.current.getDuration();
 
-          setCurrentTime(
-            time || 0
-          );
+          setCurrentTime(time || 0);
 
           if (total) {
             setDuration(total);
@@ -379,17 +350,13 @@ export default function Home() {
       event.currentTarget.getBoundingClientRect();
 
     const percentage =
-      (event.clientX -
-        rect.left) /
+      (event.clientX - rect.left) /
       rect.width;
 
     const newTime =
       Math.max(
         0,
-        Math.min(
-          1,
-          percentage
-        )
+        Math.min(1, percentage)
       ) * duration;
 
     playerRef.current.seekTo(
@@ -402,22 +369,16 @@ export default function Home() {
      FORMAT TIME
   ========================= */
 
-  function formatTime(
-    seconds: number
-  ) {
+  function formatTime(seconds: number) {
     if (!seconds) {
       return "0:00";
     }
 
     const minutes =
-      Math.floor(
-        seconds / 60
-      );
+      Math.floor(seconds / 60);
 
     const secondsPart =
-      Math.floor(
-        seconds % 60
-      )
+      Math.floor(seconds % 60)
         .toString()
         .padStart(2, "0");
 
@@ -432,9 +393,7 @@ export default function Home() {
     duration > 0
       ? Math.min(
           100,
-          (currentTime /
-            duration) *
-            100
+          (currentTime / duration) * 100
         )
       : 0;
 
@@ -448,10 +407,19 @@ export default function Home() {
           BACKGROUND +
           ")",
 
-        backgroundSize: "cover",
+        /*
+         * DESKTOP SAME
+         * MOBILE: पूरा background visible
+         */
+        backgroundSize:
+          isMobile
+            ? "100% 100%"
+            : "cover",
 
         backgroundPosition:
-          "center center",
+          isMobile
+            ? "center center"
+            : "center center",
 
         backgroundAttachment:
           isMobile
@@ -472,8 +440,7 @@ export default function Home() {
             ? "145px"
             : "120px",
 
-        boxSizing:
-          "border-box",
+        boxSizing: "border-box",
       }}
     >
       {/* =========================
@@ -536,8 +503,7 @@ export default function Home() {
 
           color: "white",
 
-          textDecoration:
-            "none",
+          textDecoration: "none",
 
           zIndex: 20,
 
@@ -551,8 +517,7 @@ export default function Home() {
               ? "7px 9px"
               : "8px 12px",
 
-          borderRadius:
-            "18px",
+          borderRadius: "18px",
 
           background:
             "rgba(30,20,16,.45)",
@@ -565,6 +530,8 @@ export default function Home() {
 
           WebkitBackdropFilter:
             "blur(8px)",
+
+          whiteSpace: "nowrap",
         }}
       >
         ▶ YT Music
@@ -580,19 +547,18 @@ export default function Home() {
 
           paddingTop:
             isMobile
-              ? "62px"
+              ? "76px"
               : "65px",
 
           paddingLeft: "10px",
 
           paddingRight: "10px",
 
-          textAlign:
-            "center",
+          textAlign: "center",
 
           fontSize:
             isMobile
-              ? "clamp(38px, 11vw, 54px)"
+              ? "clamp(38px, 11vw, 52px)"
               : "clamp(58px, 8vw, 115px)",
 
           lineHeight: "1",
@@ -604,8 +570,7 @@ export default function Home() {
               ? "-1px"
               : "-2px",
 
-          whiteSpace:
-            "nowrap",
+          whiteSpace: "nowrap",
 
           textShadow:
             "0 5px 25px rgba(0,0,0,.45)",
@@ -636,25 +601,24 @@ export default function Home() {
 
           right:
             isMobile
-              ? "8px"
+              ? "7px"
               : "20px",
 
           width:
             isMobile
-              ? "min(245px, calc(100vw - 16px))"
+              ? "min(225px, calc(100vw - 14px))"
               : "265px",
 
           maxWidth: "265px",
 
           margin:
             isMobile
-              ? "18px 8px 0 auto"
+              ? "16px 7px 0 auto"
               : "0",
 
           zIndex: 5,
 
-          boxSizing:
-            "border-box",
+          boxSizing: "border-box",
         }}
       >
         {/* COUNTDOWN */}
@@ -663,12 +627,12 @@ export default function Home() {
           style={{
             padding:
               isMobile
-                ? "8px"
+                ? "7px"
                 : "10px",
 
             borderRadius:
               isMobile
-                ? "15px"
+                ? "14px"
                 : "17px",
 
             background:
@@ -689,8 +653,7 @@ export default function Home() {
         >
           <div
             style={{
-              textAlign:
-                "center",
+              textAlign: "center",
 
               fontSize:
                 isMobile
@@ -707,8 +670,7 @@ export default function Home() {
 
           <div
             style={{
-              textAlign:
-                "center",
+              textAlign: "center",
 
               fontSize:
                 isMobile
@@ -742,50 +704,33 @@ export default function Home() {
             }}
           >
             <CountdownBox
-              value={
-                countdown.days
-              }
+              value={countdown.days}
               label="दिन"
-              small={
-                isMobile
-              }
+              small={isMobile}
             />
 
             <CountdownBox
-              value={
-                countdown.hours
-              }
+              value={countdown.hours}
               label="घंटे"
-              small={
-                isMobile
-              }
+              small={isMobile}
             />
 
             <CountdownBox
-              value={
-                countdown.minutes
-              }
+              value={countdown.minutes}
               label="मिनट"
-              small={
-                isMobile
-              }
+              small={isMobile}
             />
 
             <CountdownBox
-              value={
-                countdown.seconds
-              }
+              value={countdown.seconds}
               label="सेकंड"
-              small={
-                isMobile
-              }
+              small={isMobile}
             />
           </div>
 
           <div
             style={{
-              textAlign:
-                "center",
+              textAlign: "center",
 
               marginTop:
                 isMobile
@@ -820,7 +765,7 @@ export default function Home() {
 
             borderRadius:
               isMobile
-                ? "15px"
+                ? "14px"
                 : "17px",
 
             background:
@@ -841,8 +786,7 @@ export default function Home() {
         >
           <div
             style={{
-              textAlign:
-                "center",
+              textAlign: "center",
 
               fontSize:
                 isMobile
@@ -873,12 +817,9 @@ export default function Home() {
             {CHHATH_DAYS.map(
               (item) => (
                 <div
-                  key={
-                    item.date
-                  }
+                  key={item.date}
                   style={{
-                    display:
-                      "flex",
+                    display: "flex",
 
                     alignItems:
                       "center",
@@ -925,9 +866,7 @@ export default function Home() {
                         "center",
                     }}
                   >
-                    {
-                      item.icon
-                    }
+                    {item.icon}
                   </div>
 
                   <div
@@ -944,8 +883,7 @@ export default function Home() {
                             ? "8px"
                             : "10px",
 
-                        fontWeight:
-                          800,
+                        fontWeight: 800,
 
                         whiteSpace:
                           "nowrap",
@@ -957,9 +895,7 @@ export default function Home() {
                           "ellipsis",
                       }}
                     >
-                      {
-                        item.title
-                      }
+                      {item.title}
                     </div>
 
                     <div
@@ -969,11 +905,9 @@ export default function Home() {
                             ? "5px"
                             : "7px",
 
-                        opacity:
-                          0.6,
+                        opacity: 0.6,
 
-                        marginTop:
-                          "1px",
+                        marginTop: "1px",
 
                         whiteSpace:
                           "nowrap",
@@ -985,13 +919,8 @@ export default function Home() {
                           "ellipsis",
                       }}
                     >
-                      {
-                        item.date
-                      }{" "}
-                      •{" "}
-                      {
-                        item.day
-                      }
+                      {item.date} •{" "}
+                      {item.day}
                     </div>
                   </div>
                 </div>
@@ -1003,6 +932,7 @@ export default function Home() {
 
       {/* =========================
           ADD SUGGESTIONS
+          MOBILE: BOTTOM RIGHT
       ========================= */}
 
       <a
@@ -1014,18 +944,17 @@ export default function Home() {
 
           right:
             isMobile
-              ? "10px"
+              ? "8px"
               : "20px",
 
           bottom:
             isMobile
-              ? "38px"
+              ? "17px"
               : "18px",
 
           color: "white",
 
-          textDecoration:
-            "none",
+          textDecoration: "none",
 
           zIndex: 60,
 
@@ -1039,8 +968,7 @@ export default function Home() {
               ? "7px 10px"
               : "10px 15px",
 
-          borderRadius:
-            "22px",
+          borderRadius: "22px",
 
           background:
             "rgba(40,25,20,.68)",
@@ -1054,8 +982,7 @@ export default function Home() {
           WebkitBackdropFilter:
             "blur(10px)",
 
-          whiteSpace:
-            "nowrap",
+          whiteSpace: "nowrap",
 
           boxShadow:
             "0 6px 20px rgba(0,0,0,.25)",
@@ -1074,9 +1001,12 @@ export default function Home() {
 
           left: "50%",
 
+          /*
+           * MOBILE PLAYER थोड़ा ऊपर
+           */
           bottom:
             isMobile
-              ? "8px"
+              ? "52px"
               : "30px",
 
           transform:
@@ -1091,8 +1021,7 @@ export default function Home() {
 
           display: "flex",
 
-          alignItems:
-            "center",
+          alignItems: "center",
 
           gap:
             isMobile
@@ -1126,8 +1055,7 @@ export default function Home() {
 
           zIndex: 50,
 
-          boxSizing:
-            "border-box",
+          boxSizing: "border-box",
         }}
       >
         {/* COVER */}
@@ -1149,11 +1077,9 @@ export default function Home() {
                 ? "43px"
                 : "72px",
 
-            borderRadius:
-              "50%",
+            borderRadius: "50%",
 
-            overflow:
-              "hidden",
+            overflow: "hidden",
 
             border:
               "2px solid rgba(255,255,255,.7)",
@@ -1167,8 +1093,7 @@ export default function Home() {
 
               height: "100%",
 
-              objectFit:
-                "cover",
+              objectFit: "cover",
 
               display: "block",
             }}
@@ -1183,8 +1108,7 @@ export default function Home() {
 
             minWidth: 0,
 
-            overflow:
-              "hidden",
+            overflow: "hidden",
           }}
         >
           <div
@@ -1196,11 +1120,9 @@ export default function Home() {
 
               fontWeight: 700,
 
-              whiteSpace:
-                "nowrap",
+              whiteSpace: "nowrap",
 
-              overflow:
-                "hidden",
+              overflow: "hidden",
 
               textOverflow:
                 "ellipsis",
@@ -1220,11 +1142,9 @@ export default function Home() {
 
               opacity: 0.7,
 
-              whiteSpace:
-                "nowrap",
+              whiteSpace: "nowrap",
 
-              overflow:
-                "hidden",
+              overflow: "hidden",
 
               textOverflow:
                 "ellipsis",
@@ -1250,8 +1170,7 @@ export default function Home() {
               background:
                 "transparent",
 
-              cursor:
-                "pointer",
+              cursor: "pointer",
             }}
           >
             <span
@@ -1262,8 +1181,7 @@ export default function Home() {
 
                 height: "3px",
 
-                borderRadius:
-                  "5px",
+                borderRadius: "5px",
 
                 background:
                   "rgba(255,255,255,.3)",
@@ -1271,20 +1189,16 @@ export default function Home() {
             >
               <span
                 style={{
-                  display:
-                    "block",
+                  display: "block",
 
                   height: "100%",
 
                   width:
-                    progress +
-                    "%",
+                    progress + "%",
 
-                  borderRadius:
-                    "5px",
+                  borderRadius: "5px",
 
-                  background:
-                    "white",
+                  background: "white",
                 }}
               />
             </span>
@@ -1300,22 +1214,15 @@ export default function Home() {
               opacity: 0.7,
             }}
           >
-            {formatTime(
-              currentTime
-            )}{" "}
-            /{" "}
-            {formatTime(
-              duration
-            )}
+            {formatTime(currentTime)} /{" "}
+            {formatTime(duration)}
           </div>
         </div>
 
         {/* PREVIOUS */}
 
         <button
-          onClick={
-            previousSong
-          }
+          onClick={previousSong}
           aria-label="Previous song"
           style={{
             ...buttonStyle,
@@ -1342,9 +1249,7 @@ export default function Home() {
         {/* PLAY */}
 
         <button
-          onClick={
-            playPause
-          }
+          onClick={playPause}
           aria-label={
             playing
               ? "Pause"
@@ -1363,14 +1268,11 @@ export default function Home() {
                 ? "38px"
                 : "54px",
 
-            borderRadius:
-              "50%",
+            borderRadius: "50%",
 
-            background:
-              "white",
+            background: "white",
 
-            color:
-              "#241a15",
+            color: "#241a15",
 
             fontSize:
               isMobile
@@ -1378,17 +1280,13 @@ export default function Home() {
                 : "20px",
           }}
         >
-          {playing
-            ? "Ⅱ"
-            : "▶"}
+          {playing ? "Ⅱ" : "▶"}
         </button>
 
         {/* NEXT */}
 
         <button
-          onClick={
-            nextSong
-          }
+          onClick={nextSong}
           aria-label="Next song"
           style={{
             ...buttonStyle,
@@ -1415,6 +1313,7 @@ export default function Home() {
 
       {/* =========================
           CREDIT
+          MOBILE: BOTTOM LEFT
       ========================= */}
 
       <div
@@ -1423,17 +1322,12 @@ export default function Home() {
 
           left:
             isMobile
-              ? "50%"
+              ? "8px"
               : "18px",
-
-          transform:
-            isMobile
-              ? "translateX(-50%)"
-              : "none",
 
           bottom:
             isMobile
-              ? "1px"
+              ? "17px"
               : "20px",
 
           color:
@@ -1446,8 +1340,10 @@ export default function Home() {
 
           zIndex: 40,
 
-          whiteSpace:
-            "nowrap",
+          whiteSpace: "nowrap",
+
+          textShadow:
+            "0 2px 8px rgba(0,0,0,.5)",
         }}
       >
         Made by{" "}
@@ -1461,8 +1357,7 @@ export default function Home() {
 
             fontWeight: 700,
 
-            textDecoration:
-              "none",
+            textDecoration: "none",
           }}
         >
           @nomadevishal
@@ -1488,8 +1383,7 @@ export default function Home() {
 
           opacity: 0,
 
-          pointerEvents:
-            "none",
+          pointerEvents: "none",
         }}
       />
 
@@ -1521,8 +1415,16 @@ export default function Home() {
         }
 
         @media (max-width: 700px) {
+          html,
           body {
+            width: 100%;
+            min-height: 100%;
             overflow-x: hidden;
+          }
+
+          body {
+            margin: 0;
+            padding: 0;
           }
         }
       `}</style>
@@ -1546,8 +1448,7 @@ function CountdownBox({
   return (
     <div
       style={{
-        textAlign:
-          "center",
+        textAlign: "center",
 
         padding:
           small
@@ -1567,8 +1468,7 @@ function CountdownBox({
 
         minWidth: 0,
 
-        overflow:
-          "hidden",
+        overflow: "hidden",
       }}
     >
       <div
@@ -1582,20 +1482,15 @@ function CountdownBox({
 
           fontWeight: 900,
 
-          whiteSpace:
-            "nowrap",
+          whiteSpace: "nowrap",
         }}
       >
-        {String(value).padStart(
-          2,
-          "0"
-        )}
+        {String(value).padStart(2, "0")}
       </div>
 
       <div
         style={{
-          marginTop:
-            "3px",
+          marginTop: "3px",
 
           fontSize:
             small
@@ -1604,8 +1499,7 @@ function CountdownBox({
 
           opacity: 0.7,
 
-          whiteSpace:
-            "nowrap",
+          whiteSpace: "nowrap",
         }}
       >
         {label}
@@ -1625,16 +1519,13 @@ const buttonStyle = {
 
   border: 0,
 
-  background:
-    "transparent",
+  background: "transparent",
 
   color: "white",
 
-  cursor:
-    "pointer",
+  cursor: "pointer",
 
-  fontSize:
-    "18px",
+  fontSize: "18px",
 
   flexShrink: 0,
 
@@ -1642,9 +1533,7 @@ const buttonStyle = {
 
   display: "flex",
 
-  alignItems:
-    "center",
+  alignItems: "center",
 
-  justifyContent:
-    "center",
+  justifyContent: "center",
 };
