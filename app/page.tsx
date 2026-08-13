@@ -10,7 +10,6 @@ declare global {
 }
 
 const PLAYLIST_ID = "PLGeZBZvchIWA";
-
 const BACKGROUND = "/background.png";
 
 const COVER =
@@ -157,9 +156,7 @@ export default function Home() {
   useEffect(() => {
     function updateInfo() {
       try {
-        if (!playerRef.current) {
-          return;
-        }
+        if (!playerRef.current) return;
 
         const data =
           playerRef.current.getVideoData();
@@ -182,61 +179,52 @@ export default function Home() {
     }
 
     function createPlayer() {
-      if (!hostRef.current) {
-        return;
-      }
+      if (!hostRef.current) return;
+      if (!window.YT?.Player) return;
+      if (playerRef.current) return;
 
-      if (!window.YT?.Player) {
-        return;
-      }
+      playerRef.current = new window.YT.Player(
+        hostRef.current,
+        {
+          width: "1",
+          height: "1",
 
-      if (playerRef.current) {
-        return;
-      }
+          playerVars: {
+            listType: "playlist",
+            list: PLAYLIST_ID,
+            autoplay: 0,
+            controls: 0,
+            playsinline: 1,
+          },
 
-      playerRef.current =
-        new window.YT.Player(
-          hostRef.current,
-          {
-            width: "1",
-            height: "1",
-
-            playerVars: {
-              listType: "playlist",
-              list: PLAYLIST_ID,
-              autoplay: 0,
-              controls: 0,
-              playsinline: 1,
+          events: {
+            onReady() {
+              setReady(true);
+              updateInfo();
             },
 
-            events: {
-              onReady() {
-                setReady(true);
-                updateInfo();
-              },
+            onStateChange(event: any) {
+              if (
+                event.data ===
+                window.YT.PlayerState.PLAYING
+              ) {
+                setPlaying(true);
+              } else {
+                setPlaying(false);
+              }
 
-              onStateChange(event: any) {
-                if (
-                  event.data ===
-                  window.YT.PlayerState.PLAYING
-                ) {
-                  setPlaying(true);
-                } else {
-                  setPlaying(false);
-                }
-
-                updateInfo();
-              },
-
-              onError(event: any) {
-                console.log(
-                  "YouTube error:",
-                  event.data
-                );
-              },
+              updateInfo();
             },
-          }
-        );
+
+            onError(event: any) {
+              console.log(
+                "YouTube error:",
+                event.data
+              );
+            },
+          },
+        }
+      );
     }
 
     if (window.YT?.Player) {
@@ -263,26 +251,23 @@ export default function Home() {
       }
     }
 
-    const timer =
-      window.setInterval(() => {
-        try {
-          if (!playerRef.current) {
-            return;
-          }
+    const timer = window.setInterval(() => {
+      try {
+        if (!playerRef.current) return;
 
-          const time =
-            playerRef.current.getCurrentTime();
+        const time =
+          playerRef.current.getCurrentTime();
 
-          const total =
-            playerRef.current.getDuration();
+        const total =
+          playerRef.current.getDuration();
 
-          setCurrentTime(time || 0);
+        setCurrentTime(time || 0);
 
-          if (total) {
-            setDuration(total);
-          }
-        } catch {}
-      }, 500);
+        if (total) {
+          setDuration(total);
+        }
+      } catch {}
+    }, 500);
 
     return () => {
       window.clearInterval(timer);
@@ -300,12 +285,7 @@ export default function Home() {
   ========================= */
 
   function playPause() {
-    if (
-      !playerRef.current ||
-      !ready
-    ) {
-      return;
-    }
+    if (!playerRef.current || !ready) return;
 
     if (playing) {
       playerRef.current.pauseVideo();
@@ -315,23 +295,13 @@ export default function Home() {
   }
 
   function previousSong() {
-    if (
-      !playerRef.current ||
-      !ready
-    ) {
-      return;
-    }
+    if (!playerRef.current || !ready) return;
 
     playerRef.current.previousVideo();
   }
 
   function nextSong() {
-    if (
-      !playerRef.current ||
-      !ready
-    ) {
-      return;
-    }
+    if (!playerRef.current || !ready) return;
 
     playerRef.current.nextVideo();
   }
@@ -339,10 +309,7 @@ export default function Home() {
   function seek(
     event: React.MouseEvent<HTMLButtonElement>
   ) {
-    if (
-      !playerRef.current ||
-      !duration
-    ) {
+    if (!playerRef.current || !duration) {
       return;
     }
 
@@ -374,19 +341,17 @@ export default function Home() {
       return "0:00";
     }
 
-    const minutes =
-      Math.floor(seconds / 60);
-
-    const secondsPart =
-      Math.floor(seconds % 60)
-        .toString()
-        .padStart(2, "0");
-
-    return (
-      minutes +
-      ":" +
-      secondsPart
+    const minutes = Math.floor(
+      seconds / 60
     );
+
+    const secondsPart = Math.floor(
+      seconds % 60
+    )
+      .toString()
+      .padStart(2, "0");
+
+    return minutes + ":" + secondsPart;
   }
 
   const progress =
@@ -408,23 +373,19 @@ export default function Home() {
           ")",
 
         /*
-         * DESKTOP SAME
-         * MOBILE: पूरा background visible
+         * Desktop untouched.
+         * Mobile: पूरा background दिखेगा.
          */
-        backgroundSize:
-          isMobile
-            ? "100% 100%"
-            : "cover",
+        backgroundSize: isMobile
+          ? "100% 100%"
+          : "cover",
 
         backgroundPosition:
-          isMobile
-            ? "center center"
-            : "center center",
+          "center center",
 
-        backgroundAttachment:
-          isMobile
-            ? "scroll"
-            : "fixed",
+        backgroundAttachment: isMobile
+          ? "scroll"
+          : "fixed",
 
         color: "white",
 
@@ -435,10 +396,9 @@ export default function Home() {
 
         overflowX: "hidden",
 
-        paddingBottom:
-          isMobile
-            ? "145px"
-            : "120px",
+        paddingBottom: isMobile
+          ? "155px"
+          : "120px",
 
         boxSizing: "border-box",
       }}
@@ -451,20 +411,17 @@ export default function Home() {
         style={{
           position: "absolute",
 
-          top:
-            isMobile
-              ? "12px"
-              : "18px",
+          top: isMobile
+            ? "10px"
+            : "18px",
 
-          left:
-            isMobile
-              ? "12px"
-              : "18px",
+          left: isMobile
+            ? "10px"
+            : "18px",
 
-          fontSize:
-            isMobile
-              ? "15px"
-              : "18px",
+          fontSize: isMobile
+            ? "14px"
+            : "18px",
 
           fontWeight: 800,
 
@@ -491,15 +448,13 @@ export default function Home() {
         style={{
           position: "absolute",
 
-          top:
-            isMobile
-              ? "12px"
-              : "20px",
+          top: isMobile
+            ? "10px"
+            : "20px",
 
-          right:
-            isMobile
-              ? "12px"
-              : "24px",
+          right: isMobile
+            ? "10px"
+            : "24px",
 
           color: "white",
 
@@ -507,15 +462,13 @@ export default function Home() {
 
           zIndex: 20,
 
-          fontSize:
-            isMobile
-              ? "11px"
-              : "14px",
+          fontSize: isMobile
+            ? "10px"
+            : "14px",
 
-          padding:
-            isMobile
-              ? "7px 9px"
-              : "8px 12px",
+          padding: isMobile
+            ? "6px 8px"
+            : "8px 12px",
 
           borderRadius: "18px",
 
@@ -545,30 +498,26 @@ export default function Home() {
         style={{
           margin: 0,
 
-          paddingTop:
-            isMobile
-              ? "76px"
-              : "65px",
+          paddingTop: isMobile
+            ? "70px"
+            : "65px",
 
           paddingLeft: "10px",
-
           paddingRight: "10px",
 
           textAlign: "center",
 
-          fontSize:
-            isMobile
-              ? "clamp(38px, 11vw, 52px)"
-              : "clamp(58px, 8vw, 115px)",
+          fontSize: isMobile
+            ? "clamp(34px, 11vw, 50px)"
+            : "clamp(58px, 8vw, 115px)",
 
           lineHeight: "1",
 
           fontWeight: 900,
 
-          letterSpacing:
-            isMobile
-              ? "-1px"
-              : "-2px",
+          letterSpacing: isMobile
+            ? "-1px"
+            : "-2px",
 
           whiteSpace: "nowrap",
 
@@ -589,51 +538,51 @@ export default function Home() {
 
       <div
         style={{
-          position:
-            isMobile
-              ? "relative"
-              : "absolute",
+          position: isMobile
+            ? "relative"
+            : "absolute",
 
-          top:
-            isMobile
-              ? "auto"
-              : "175px",
+          top: isMobile
+            ? "auto"
+            : "175px",
 
-          right:
-            isMobile
-              ? "7px"
-              : "20px",
+          right: isMobile
+            ? "6px"
+            : "20px",
 
-          width:
-            isMobile
-              ? "min(225px, calc(100vw - 14px))"
-              : "265px",
+          width: isMobile
+            ? "min(210px, calc(100vw - 12px))"
+            : "265px",
 
           maxWidth: "265px",
 
-          margin:
-            isMobile
-              ? "16px 7px 0 auto"
-              : "0",
+          margin: isMobile
+            ? "14px 6px 0 auto"
+            : "0",
 
           zIndex: 5,
 
           boxSizing: "border-box",
+
+          transform: isMobile
+            ? "scale(.96)"
+            : "none",
+
+          transformOrigin:
+            "top right",
         }}
       >
         {/* COUNTDOWN */}
 
         <section
           style={{
-            padding:
-              isMobile
-                ? "7px"
-                : "10px",
+            padding: isMobile
+              ? "6px"
+              : "10px",
 
-            borderRadius:
-              isMobile
-                ? "14px"
-                : "17px",
+            borderRadius: isMobile
+              ? "13px"
+              : "17px",
 
             background:
               "linear-gradient(145deg, rgba(48,28,20,.70), rgba(25,16,12,.54))",
@@ -655,10 +604,9 @@ export default function Home() {
             style={{
               textAlign: "center",
 
-              fontSize:
-                isMobile
-                  ? "9px"
-                  : "11px",
+              fontSize: isMobile
+                ? "8px"
+                : "11px",
 
               fontWeight: 700,
 
@@ -672,19 +620,17 @@ export default function Home() {
             style={{
               textAlign: "center",
 
-              fontSize:
-                isMobile
-                  ? "10px"
-                  : "13px",
+              fontSize: isMobile
+                ? "9px"
+                : "13px",
 
               fontWeight: 800,
 
               marginTop: "2px",
 
-              marginBottom:
-                isMobile
-                  ? "5px"
-                  : "7px",
+              marginBottom: isMobile
+                ? "4px"
+                : "7px",
             }}
           >
             नहाय-खाय शुरू होने में
@@ -697,10 +643,9 @@ export default function Home() {
               gridTemplateColumns:
                 "repeat(4,1fr)",
 
-              gap:
-                isMobile
-                  ? "3px"
-                  : "4px",
+              gap: isMobile
+                ? "2px"
+                : "4px",
             }}
           >
             <CountdownBox
@@ -732,15 +677,13 @@ export default function Home() {
             style={{
               textAlign: "center",
 
-              marginTop:
-                isMobile
-                  ? "4px"
-                  : "6px",
+              marginTop: isMobile
+                ? "3px"
+                : "6px",
 
-              fontSize:
-                isMobile
-                  ? "6px"
-                  : "8px",
+              fontSize: isMobile
+                ? "5px"
+                : "8px",
 
               opacity: 0.65,
             }}
@@ -753,20 +696,17 @@ export default function Home() {
 
         <section
           style={{
-            marginTop:
-              isMobile
-                ? "5px"
-                : "7px",
+            marginTop: isMobile
+              ? "4px"
+              : "7px",
 
-            padding:
-              isMobile
-                ? "6px"
-                : "9px",
+            padding: isMobile
+              ? "5px"
+              : "9px",
 
-            borderRadius:
-              isMobile
-                ? "14px"
-                : "17px",
+            borderRadius: isMobile
+              ? "13px"
+              : "17px",
 
             background:
               "linear-gradient(145deg, rgba(48,28,20,.66), rgba(25,16,12,.50))",
@@ -788,17 +728,15 @@ export default function Home() {
             style={{
               textAlign: "center",
 
-              fontSize:
-                isMobile
-                  ? "10px"
-                  : "13px",
+              fontSize: isMobile
+                ? "9px"
+                : "13px",
 
               fontWeight: 800,
 
-              marginBottom:
-                isMobile
-                  ? "4px"
-                  : "6px",
+              marginBottom: isMobile
+                ? "3px"
+                : "6px",
             }}
           >
             📅 छठ पूजा 2026
@@ -808,10 +746,9 @@ export default function Home() {
             style={{
               display: "grid",
 
-              gap:
-                isMobile
-                  ? "3px"
-                  : "4px",
+              gap: isMobile
+                ? "2px"
+                : "4px",
             }}
           >
             {CHHATH_DAYS.map(
@@ -824,19 +761,17 @@ export default function Home() {
                     alignItems:
                       "center",
 
-                    gap:
-                      isMobile
-                        ? "4px"
-                        : "6px",
+                    gap: isMobile
+                      ? "3px"
+                      : "6px",
 
-                    padding:
-                      isMobile
-                        ? "3px 4px"
-                        : "5px 6px",
+                    padding: isMobile
+                      ? "3px"
+                      : "5px 6px",
 
                     borderRadius:
                       isMobile
-                        ? "7px"
+                        ? "6px"
                         : "9px",
 
                     background:
@@ -847,19 +782,18 @@ export default function Home() {
                 >
                   <div
                     style={{
-                      width:
-                        isMobile
-                          ? "18px"
-                          : "21px",
+                      width: isMobile
+                        ? "17px"
+                        : "21px",
 
                       minWidth:
                         isMobile
-                          ? "18px"
+                          ? "17px"
                           : "21px",
 
                       fontSize:
                         isMobile
-                          ? "12px"
+                          ? "11px"
                           : "15px",
 
                       textAlign:
@@ -880,7 +814,7 @@ export default function Home() {
                       style={{
                         fontSize:
                           isMobile
-                            ? "8px"
+                            ? "7px"
                             : "10px",
 
                         fontWeight: 800,
@@ -902,7 +836,7 @@ export default function Home() {
                       style={{
                         fontSize:
                           isMobile
-                            ? "5px"
+                            ? "4.5px"
                             : "7px",
 
                         opacity: 0.6,
@@ -932,7 +866,7 @@ export default function Home() {
 
       {/* =========================
           ADD SUGGESTIONS
-          MOBILE: BOTTOM RIGHT
+          MOBILE BOTTOM RIGHT
       ========================= */}
 
       <a
@@ -942,15 +876,13 @@ export default function Home() {
         style={{
           position: "fixed",
 
-          right:
-            isMobile
-              ? "8px"
-              : "20px",
+          right: isMobile
+            ? "7px"
+            : "20px",
 
-          bottom:
-            isMobile
-              ? "17px"
-              : "18px",
+          bottom: isMobile
+            ? "10px"
+            : "18px",
 
           color: "white",
 
@@ -958,15 +890,13 @@ export default function Home() {
 
           zIndex: 60,
 
-          fontSize:
-            isMobile
-              ? "9px"
-              : "13px",
+          fontSize: isMobile
+            ? "8px"
+            : "13px",
 
-          padding:
-            isMobile
-              ? "7px 10px"
-              : "10px 15px",
+          padding: isMobile
+            ? "6px 9px"
+            : "10px 15px",
 
           borderRadius: "22px",
 
@@ -1001,21 +931,16 @@ export default function Home() {
 
           left: "50%",
 
-          /*
-           * MOBILE PLAYER थोड़ा ऊपर
-           */
-          bottom:
-            isMobile
-              ? "52px"
-              : "30px",
+          bottom: isMobile
+            ? "45px"
+            : "30px",
 
           transform:
             "translateX(-50%)",
 
-          width:
-            isMobile
-              ? "calc(100vw - 14px)"
-              : "min(590px,92vw)",
+          width: isMobile
+            ? "calc(100vw - 10px)"
+            : "min(590px,92vw)",
 
           maxWidth: "590px",
 
@@ -1023,20 +948,17 @@ export default function Home() {
 
           alignItems: "center",
 
-          gap:
-            isMobile
-              ? "3px"
-              : "12px",
+          gap: isMobile
+            ? "2px"
+            : "12px",
 
-          padding:
-            isMobile
-              ? "6px"
-              : "10px",
+          padding: isMobile
+            ? "5px"
+            : "10px",
 
-          borderRadius:
-            isMobile
-              ? "25px"
-              : "60px",
+          borderRadius: isMobile
+            ? "22px"
+            : "60px",
 
           background:
             "rgba(45,24,17,.94)",
@@ -1062,20 +984,17 @@ export default function Home() {
 
         <div
           style={{
-            width:
-              isMobile
-                ? "43px"
-                : "72px",
+            width: isMobile
+              ? "40px"
+              : "72px",
 
-            height:
-              isMobile
-                ? "43px"
-                : "72px",
+            height: isMobile
+              ? "40px"
+              : "72px",
 
-            minWidth:
-              isMobile
-                ? "43px"
-                : "72px",
+            minWidth: isMobile
+              ? "40px"
+              : "72px",
 
             borderRadius: "50%",
 
@@ -1113,10 +1032,9 @@ export default function Home() {
         >
           <div
             style={{
-              fontSize:
-                isMobile
-                  ? "10px"
-                  : "16px",
+              fontSize: isMobile
+                ? "9px"
+                : "16px",
 
               fontWeight: 700,
 
@@ -1135,10 +1053,9 @@ export default function Home() {
             style={{
               marginTop: "2px",
 
-              fontSize:
-                isMobile
-                  ? "7px"
-                  : "13px",
+              fontSize: isMobile
+                ? "6px"
+                : "13px",
 
               opacity: 0.7,
 
@@ -1159,11 +1076,11 @@ export default function Home() {
             style={{
               width: "100%",
 
-              height: "12px",
+              height: "10px",
 
               padding: 0,
 
-              marginTop: "3px",
+              marginTop: "2px",
 
               border: 0,
 
@@ -1198,7 +1115,8 @@ export default function Home() {
 
                   borderRadius: "5px",
 
-                  background: "white",
+                  background:
+                    "white",
                 }}
               />
             </span>
@@ -1206,16 +1124,20 @@ export default function Home() {
 
           <div
             style={{
-              fontSize:
-                isMobile
-                  ? "6px"
-                  : "11px",
+              fontSize: isMobile
+                ? "5px"
+                : "11px",
 
               opacity: 0.7,
             }}
           >
-            {formatTime(currentTime)} /{" "}
-            {formatTime(duration)}
+            {formatTime(
+              currentTime
+            )}{" "}
+            /{" "}
+            {formatTime(
+              duration
+            )}
           </div>
         </div>
 
@@ -1227,20 +1149,17 @@ export default function Home() {
           style={{
             ...buttonStyle,
 
-            width:
-              isMobile
-                ? "22px"
-                : "38px",
+            width: isMobile
+              ? "20px"
+              : "38px",
 
-            height:
-              isMobile
-                ? "34px"
-                : "42px",
+            height: isMobile
+              ? "32px"
+              : "42px",
 
-            fontSize:
-              isMobile
-                ? "9px"
-                : "18px",
+            fontSize: isMobile
+              ? "8px"
+              : "18px",
           }}
         >
           ◀
@@ -1258,15 +1177,13 @@ export default function Home() {
           style={{
             ...buttonStyle,
 
-            width:
-              isMobile
-                ? "38px"
-                : "54px",
+            width: isMobile
+              ? "35px"
+              : "54px",
 
-            height:
-              isMobile
-                ? "38px"
-                : "54px",
+            height: isMobile
+              ? "35px"
+              : "54px",
 
             borderRadius: "50%",
 
@@ -1274,10 +1191,9 @@ export default function Home() {
 
             color: "#241a15",
 
-            fontSize:
-              isMobile
-                ? "13px"
-                : "20px",
+            fontSize: isMobile
+              ? "12px"
+              : "20px",
           }}
         >
           {playing ? "Ⅱ" : "▶"}
@@ -1291,20 +1207,17 @@ export default function Home() {
           style={{
             ...buttonStyle,
 
-            width:
-              isMobile
-                ? "22px"
-                : "38px",
+            width: isMobile
+              ? "20px"
+              : "38px",
 
-            height:
-              isMobile
-                ? "34px"
-                : "42px",
+            height: isMobile
+              ? "32px"
+              : "42px",
 
-            fontSize:
-              isMobile
-                ? "9px"
-                : "18px",
+            fontSize: isMobile
+              ? "8px"
+              : "18px",
           }}
         >
           ▶
@@ -1313,30 +1226,27 @@ export default function Home() {
 
       {/* =========================
           CREDIT
-          MOBILE: BOTTOM LEFT
+          MOBILE BOTTOM LEFT
       ========================= */}
 
       <div
         style={{
           position: "fixed",
 
-          left:
-            isMobile
-              ? "8px"
-              : "18px",
+          left: isMobile
+            ? "7px"
+            : "18px",
 
-          bottom:
-            isMobile
-              ? "17px"
-              : "20px",
+          bottom: isMobile
+            ? "10px"
+            : "20px",
 
           color:
             "rgba(255,255,255,.75)",
 
-          fontSize:
-            isMobile
-              ? "7px"
-              : "13px",
+          fontSize: isMobile
+            ? "6.5px"
+            : "13px",
 
           zIndex: 40,
 
@@ -1347,7 +1257,6 @@ export default function Home() {
         }}
       >
         Made by{" "}
-
         <a
           href="https://www.instagram.com/nomadevishal/"
           target="_blank"
@@ -1426,6 +1335,19 @@ export default function Home() {
             margin: 0;
             padding: 0;
           }
+
+          main {
+            width: 100%;
+            min-height: 100dvh;
+          }
+        }
+
+        @media (max-width: 380px) {
+          /* Very small phones */
+
+          h1 {
+            padding-top: 65px !important;
+          }
         }
       `}</style>
     </main>
@@ -1450,15 +1372,13 @@ function CountdownBox({
       style={{
         textAlign: "center",
 
-        padding:
-          small
-            ? "4px 1px"
-            : "7px 3px",
+        padding: small
+          ? "3px 1px"
+          : "7px 3px",
 
-        borderRadius:
-          small
-            ? "7px"
-            : "10px",
+        borderRadius: small
+          ? "6px"
+          : "10px",
 
         background:
           "rgba(255,255,255,.10)",
@@ -1473,10 +1393,9 @@ function CountdownBox({
     >
       <div
         style={{
-          fontSize:
-            small
-              ? "13px"
-              : "20px",
+          fontSize: small
+            ? "12px"
+            : "20px",
 
           lineHeight: 1,
 
@@ -1485,17 +1404,19 @@ function CountdownBox({
           whiteSpace: "nowrap",
         }}
       >
-        {String(value).padStart(2, "0")}
+        {String(value).padStart(
+          2,
+          "0"
+        )}
       </div>
 
       <div
         style={{
           marginTop: "3px",
 
-          fontSize:
-            small
-              ? "5px"
-              : "8px",
+          fontSize: small
+            ? "4.5px"
+            : "8px",
 
           opacity: 0.7,
 
