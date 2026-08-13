@@ -15,7 +15,10 @@ const BACKGROUND = "/background.png";
 const COVER =
   "https://www.apnabihar.xyz/covers/GZKPkb5dUsI.jpg";
 
-// Chhath 2026
+// =========================
+// CHHATH 2026
+// =========================
+
 const CHHATH_START = new Date(
   "2026-11-13T00:00:00+05:30"
 ).getTime();
@@ -53,6 +56,7 @@ export default function Home() {
 
   const [ready, setReady] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const [title, setTitle] = useState(
     "Kaanch Hi Baans Ke Bahangiya"
@@ -74,9 +78,9 @@ export default function Home() {
 
   const [isMobile, setIsMobile] = useState(false);
 
-  /* =========================
-     SCREEN SIZE
-  ========================= */
+  // =========================
+  // SCREEN SIZE
+  // =========================
 
   useEffect(() => {
     function checkScreen() {
@@ -92,9 +96,23 @@ export default function Home() {
     };
   }, []);
 
-  /* =========================
-     COUNTDOWN
-  ========================= */
+  // =========================
+  // PAGE LOAD ANIMATION
+  // =========================
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setLoaded(true);
+    }, 120);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, []);
+
+  // =========================
+  // COUNTDOWN
+  // =========================
 
   useEffect(() => {
     function updateCountdown() {
@@ -149,9 +167,9 @@ export default function Home() {
     };
   }, []);
 
-  /* =========================
-     YOUTUBE PLAYER
-  ========================= */
+  // =========================
+  // YOUTUBE PLAYER
+  // =========================
 
   useEffect(() => {
     function updateInfo() {
@@ -183,49 +201,48 @@ export default function Home() {
       if (!window.YT?.Player) return;
       if (playerRef.current) return;
 
-      playerRef.current =
-        new window.YT.Player(
-          hostRef.current,
-          {
-            width: "1",
-            height: "1",
+      playerRef.current = new window.YT.Player(
+        hostRef.current,
+        {
+          width: "1",
+          height: "1",
 
-            playerVars: {
-              listType: "playlist",
-              list: PLAYLIST_ID,
-              autoplay: 0,
-              controls: 0,
-              playsinline: 1,
+          playerVars: {
+            listType: "playlist",
+            list: PLAYLIST_ID,
+            autoplay: 0,
+            controls: 0,
+            playsinline: 1,
+          },
+
+          events: {
+            onReady() {
+              setReady(true);
+              updateInfo();
             },
 
-            events: {
-              onReady() {
-                setReady(true);
-                updateInfo();
-              },
+            onStateChange(event: any) {
+              if (
+                event.data ===
+                window.YT.PlayerState.PLAYING
+              ) {
+                setPlaying(true);
+              } else {
+                setPlaying(false);
+              }
 
-              onStateChange(event: any) {
-                if (
-                  event.data ===
-                  window.YT.PlayerState.PLAYING
-                ) {
-                  setPlaying(true);
-                } else {
-                  setPlaying(false);
-                }
-
-                updateInfo();
-              },
-
-              onError(event: any) {
-                console.log(
-                  "YouTube error:",
-                  event.data
-                );
-              },
+              updateInfo();
             },
-          }
-        );
+
+            onError(event: any) {
+              console.log(
+                "YouTube error:",
+                event.data
+              );
+            },
+          },
+        }
+      );
     }
 
     if (window.YT?.Player) {
@@ -281,9 +298,9 @@ export default function Home() {
     };
   }, []);
 
-  /* =========================
-     PLAYER CONTROLS
-  ========================= */
+  // =========================
+  // PLAYER CONTROLS
+  // =========================
 
   function playPause() {
     if (!playerRef.current || !ready) return;
@@ -333,9 +350,9 @@ export default function Home() {
     );
   }
 
-  /* =========================
-     FORMAT TIME
-  ========================= */
+  // =========================
+  // FORMAT TIME
+  // =========================
 
   function formatTime(seconds: number) {
     if (!seconds) {
@@ -365,20 +382,28 @@ export default function Home() {
 
   return (
     <main
+      className={loaded ? "page-loaded" : ""}
       style={{
         minHeight: "100dvh",
 
         backgroundImage:
-          "linear-gradient(rgba(0,0,0,.38),rgba(0,0,0,.38)),url(" +
+          "linear-gradient(rgba(0,0,0,.30),rgba(0,0,0,.30)),url(" +
           BACKGROUND +
           ")",
 
+        /*
+         * Mobile:
+         * पूरा background दिखाई देगा।
+         * Crop कम से कम रखा गया है।
+         */
         backgroundSize: isMobile
           ? "100% 100%"
           : "cover",
 
         backgroundPosition:
           "center center",
+
+        backgroundRepeat: "no-repeat",
 
         backgroundAttachment: isMobile
           ? "scroll"
@@ -394,17 +419,40 @@ export default function Home() {
         overflowX: "hidden",
 
         paddingBottom: isMobile
-          ? "155px"
+          ? "145px"
           : "120px",
 
         boxSizing: "border-box",
+
+        minWidth: 0,
       }}
     >
+      {/* =========================
+          SUBTLE CHHATH GLOW
+      ========================= */}
+
+      <div className="ambient-glow glow-one" />
+      <div className="ambient-glow glow-two" />
+
+      {/* =========================
+          SUBTLE PARTICLES
+      ========================= */}
+
+      <div className="particles">
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+
       {/* =========================
           BRAND
       ========================= */}
 
       <div
+        className="fade-item brand"
         style={{
           position: "absolute",
 
@@ -436,6 +484,7 @@ export default function Home() {
       ========================= */}
 
       <a
+        className="fade-item yt-music"
         href={
           "https://music.youtube.com/playlist?list=" +
           PLAYLIST_ID
@@ -492,6 +541,7 @@ export default function Home() {
       ========================= */}
 
       <h1
+        className="main-title"
         style={{
           margin: 0,
 
@@ -534,6 +584,7 @@ export default function Home() {
       ========================= */}
 
       <div
+        className="chhath-card"
         style={{
           position: isMobile
             ? "relative"
@@ -548,53 +599,37 @@ export default function Home() {
             : "20px",
 
           width: isMobile
-            ? "min(210px, calc(100vw - 12px))"
-            : "265px",
+            ? "min(215px, calc(100vw - 12px))"
+            : "275px",
 
-          maxWidth: "265px",
+          maxWidth: "275px",
 
           margin: isMobile
-            ? "14px 6px 0 auto"
+            ? "16px 6px 0 auto"
             : "0",
 
           zIndex: 5,
 
           boxSizing: "border-box",
 
-          transform: isMobile
-            ? "scale(.96)"
-            : "none",
-
           transformOrigin:
             "top right",
         }}
       >
-        {/* COUNTDOWN */}
+        {/* =========================
+            COUNTDOWN
+        ========================= */}
 
         <section
+          className="glass-panel countdown-panel"
           style={{
             padding: isMobile
-              ? "6px"
-              : "10px",
+              ? "8px"
+              : "12px",
 
             borderRadius: isMobile
-              ? "13px"
-              : "17px",
-
-            background:
-              "linear-gradient(145deg, rgba(48,28,20,.70), rgba(25,16,12,.54))",
-
-            border:
-              "1px solid rgba(255,220,170,.20)",
-
-            boxShadow:
-              "0 10px 30px rgba(0,0,0,.28)",
-
-            backdropFilter:
-              "blur(14px)",
-
-            WebkitBackdropFilter:
-              "blur(14px)",
+              ? "15px"
+              : "19px",
           }}
         >
           <div
@@ -602,22 +637,26 @@ export default function Home() {
               textAlign: "center",
 
               fontSize: isMobile
-                ? "12px"
-                : "15px",
+                ? "9px"
+                : "12px",
 
               fontWeight: 800,
 
               opacity: 0.95,
 
-              marginBottom: isMobile
-                ? "7px"
-                : "9px",
+              letterSpacing: ".2px",
             }}
           >
             🪔 छठ पूजा 2026
           </div>
 
+          {/* IMPORTANT:
+              "नहाय-खाय शुरू होने में"
+              वाला text हटाया गया है.
+          */}
+
           <div
+            className="countdown-boxes"
             style={{
               display: "grid",
 
@@ -627,6 +666,10 @@ export default function Home() {
               gap: isMobile
                 ? "3px"
                 : "5px",
+
+              marginTop: isMobile
+                ? "7px"
+                : "9px",
             }}
           >
             <CountdownBox
@@ -653,38 +696,44 @@ export default function Home() {
               small={isMobile}
             />
           </div>
+
+          <div
+            style={{
+              textAlign: "center",
+
+              marginTop: isMobile
+                ? "5px"
+                : "7px",
+
+              fontSize: isMobile
+                ? "6px"
+                : "8px",
+
+              opacity: 0.65,
+            }}
+          >
+            13 नवंबर 2026
+          </div>
         </section>
 
-        {/* CALENDAR */}
+        {/* =========================
+            CALENDAR
+        ========================= */}
 
         <section
+          className="glass-panel calendar-panel"
           style={{
             marginTop: isMobile
-              ? "4px"
-              : "7px",
+              ? "5px"
+              : "8px",
 
             padding: isMobile
-              ? "5px"
-              : "9px",
+              ? "7px"
+              : "10px",
 
             borderRadius: isMobile
-              ? "13px"
-              : "17px",
-
-            background:
-              "linear-gradient(145deg, rgba(48,28,20,.66), rgba(25,16,12,.50))",
-
-            border:
-              "1px solid rgba(255,220,170,.17)",
-
-            boxShadow:
-              "0 8px 25px rgba(0,0,0,.23)",
-
-            backdropFilter:
-              "blur(14px)",
-
-            WebkitBackdropFilter:
-              "blur(14px)",
+              ? "15px"
+              : "19px",
           }}
         >
           <div
@@ -692,14 +741,14 @@ export default function Home() {
               textAlign: "center",
 
               fontSize: isMobile
-                ? "9px"
+                ? "10px"
                 : "13px",
 
               fontWeight: 800,
 
               marginBottom: isMobile
-                ? "3px"
-                : "6px",
+                ? "5px"
+                : "7px",
             }}
           >
             📅 छठ पूजा 2026
@@ -710,14 +759,15 @@ export default function Home() {
               display: "grid",
 
               gap: isMobile
-                ? "2px"
-                : "4px",
+                ? "3px"
+                : "5px",
             }}
           >
             {CHHATH_DAYS.map(
               (item) => (
                 <div
                   key={item.date}
+                  className="calendar-row"
                   style={{
                     display: "flex",
 
@@ -725,20 +775,17 @@ export default function Home() {
                       "center",
 
                     gap: isMobile
-                      ? "3px"
-                      : "6px",
+                      ? "4px"
+                      : "7px",
 
                     padding: isMobile
-                      ? "3px"
-                      : "5px 6px",
+                      ? "4px"
+                      : "6px 7px",
 
                     borderRadius:
                       isMobile
-                        ? "6px"
-                        : "9px",
-
-                    background:
-                      "rgba(255,255,255,.08)",
+                        ? "7px"
+                        : "10px",
 
                     minWidth: 0,
                   }}
@@ -746,18 +793,18 @@ export default function Home() {
                   <div
                     style={{
                       width: isMobile
-                        ? "17px"
-                        : "21px",
+                        ? "19px"
+                        : "23px",
 
                       minWidth:
                         isMobile
-                          ? "17px"
-                          : "21px",
+                          ? "19px"
+                          : "23px",
 
                       fontSize:
                         isMobile
-                          ? "11px"
-                          : "15px",
+                          ? "12px"
+                          : "16px",
 
                       textAlign:
                         "center",
@@ -777,7 +824,7 @@ export default function Home() {
                       style={{
                         fontSize:
                           isMobile
-                            ? "7px"
+                            ? "8px"
                             : "10px",
 
                         fontWeight: 800,
@@ -799,10 +846,10 @@ export default function Home() {
                       style={{
                         fontSize:
                           isMobile
-                            ? "4.5px"
+                            ? "5px"
                             : "7px",
 
-                        opacity: 0.6,
+                        opacity: 0.62,
 
                         marginTop: "1px",
 
@@ -835,15 +882,16 @@ export default function Home() {
         href="https://www.instagram.com/nomadevishal/"
         target="_blank"
         rel="noreferrer"
+        className="suggestions-button"
         style={{
           position: "fixed",
 
           right: isMobile
-            ? "7px"
+            ? "8px"
             : "20px",
 
           bottom: isMobile
-            ? "10px"
+            ? "8px"
             : "18px",
 
           color: "white",
@@ -857,27 +905,12 @@ export default function Home() {
             : "13px",
 
           padding: isMobile
-            ? "6px 9px"
+            ? "7px 10px"
             : "10px 15px",
 
           borderRadius: "22px",
 
-          background:
-            "rgba(40,25,20,.68)",
-
-          border:
-            "1px solid rgba(255,255,255,.18)",
-
-          backdropFilter:
-            "blur(10px)",
-
-          WebkitBackdropFilter:
-            "blur(10px)",
-
           whiteSpace: "nowrap",
-
-          boxShadow:
-            "0 6px 20px rgba(0,0,0,.25)",
         }}
       >
         ✨ Add Suggestions
@@ -888,20 +921,25 @@ export default function Home() {
       ========================= */}
 
       <section
+        className={
+          playing
+            ? "music-player is-playing"
+            : "music-player"
+        }
         style={{
           position: "fixed",
 
           left: "50%",
 
           bottom: isMobile
-            ? "45px"
+            ? "43px"
             : "30px",
 
           transform:
             "translateX(-50%)",
 
           width: isMobile
-            ? "calc(100vw - 10px)"
+            ? "calc(100vw - 12px)"
             : "min(590px,92vw)",
 
           maxWidth: "590px",
@@ -911,7 +949,7 @@ export default function Home() {
           alignItems: "center",
 
           gap: isMobile
-            ? "2px"
+            ? "3px"
             : "12px",
 
           padding: isMobile
@@ -919,32 +957,24 @@ export default function Home() {
             : "10px",
 
           borderRadius: isMobile
-            ? "22px"
+            ? "23px"
             : "60px",
-
-          background:
-            "rgba(45,24,17,.94)",
-
-          border:
-            "1px solid rgba(255,255,255,.22)",
-
-          boxShadow:
-            "0 15px 45px rgba(0,0,0,.40)",
-
-          backdropFilter:
-            "blur(15px)",
-
-          WebkitBackdropFilter:
-            "blur(15px)",
 
           zIndex: 50,
 
           boxSizing: "border-box",
         }}
       >
-        {/* COVER */}
+        {/* =========================
+            COVER
+        ========================= */}
 
         <div
+          className={
+            playing
+              ? "cover-wrap playing"
+              : "cover-wrap"
+          }
           style={{
             width: isMobile
               ? "40px"
@@ -961,9 +991,6 @@ export default function Home() {
             borderRadius: "50%",
 
             overflow: "hidden",
-
-            border:
-              "2px solid rgba(255,255,255,.7)",
           }}
         >
           <img
@@ -981,7 +1008,9 @@ export default function Home() {
           />
         </div>
 
-        {/* SONG INFO */}
+        {/* =========================
+            SONG INFO
+        ========================= */}
 
         <div
           style={{
@@ -1032,13 +1061,15 @@ export default function Home() {
             {artist}
           </div>
 
+          {/* PROGRESS */}
+
           <button
             onClick={seek}
             aria-label="Seek song"
             style={{
               width: "100%",
 
-              height: "10px",
+              height: "12px",
 
               padding: 0,
 
@@ -1063,7 +1094,9 @@ export default function Home() {
                 borderRadius: "5px",
 
                 background:
-                  "rgba(255,255,255,.3)",
+                  "rgba(255,255,255,.28)",
+
+                overflow: "hidden",
               }}
             >
               <span
@@ -1079,6 +1112,9 @@ export default function Home() {
 
                   background:
                     "white",
+
+                  transition:
+                    "width .25s linear",
                 }}
               />
             </span>
@@ -1103,16 +1139,19 @@ export default function Home() {
           </div>
         </div>
 
-        {/* PREVIOUS */}
+        {/* =========================
+            PREVIOUS
+        ========================= */}
 
         <button
           onClick={previousSong}
           aria-label="Previous song"
+          className="player-button"
           style={{
             ...buttonStyle,
 
             width: isMobile
-              ? "20px"
+              ? "21px"
               : "38px",
 
             height: isMobile
@@ -1127,7 +1166,9 @@ export default function Home() {
           ◀
         </button>
 
-        {/* PLAY */}
+        {/* =========================
+            PLAY
+        ========================= */}
 
         <button
           onClick={playPause}
@@ -1135,6 +1176,11 @@ export default function Home() {
             playing
               ? "Pause"
               : "Play"
+          }
+          className={
+            playing
+              ? "play-button active"
+              : "play-button"
           }
           style={{
             ...buttonStyle,
@@ -1161,16 +1207,19 @@ export default function Home() {
           {playing ? "Ⅱ" : "▶"}
         </button>
 
-        {/* NEXT */}
+        {/* =========================
+            NEXT
+        ========================= */}
 
         <button
           onClick={nextSong}
           aria-label="Next song"
+          className="player-button"
           style={{
             ...buttonStyle,
 
             width: isMobile
-              ? "20px"
+              ? "21px"
               : "38px",
 
             height: isMobile
@@ -1191,11 +1240,12 @@ export default function Home() {
       ========================= */}
 
       <div
+        className="made-by"
         style={{
           position: "fixed",
 
           left: isMobile
-            ? "7px"
+            ? "8px"
             : "18px",
 
           bottom: isMobile
@@ -1203,10 +1253,10 @@ export default function Home() {
             : "20px",
 
           color:
-            "rgba(255,255,255,.75)",
+            "rgba(255,255,255,.78)",
 
           fontSize: isMobile
-            ? "6.5px"
+            ? "7px"
             : "13px",
 
           zIndex: 40,
@@ -1284,6 +1334,548 @@ export default function Home() {
           -webkit-tap-highlight-color: transparent;
         }
 
+        /* =========================
+           PAGE ANIMATION
+        ========================= */
+
+        .fade-item,
+        .main-title,
+        .chhath-card,
+        .music-player,
+        .made-by,
+        .suggestions-button {
+          opacity: 0;
+        }
+
+        .page-loaded .fade-item {
+          animation:
+            fadeDown
+            0.7s
+            ease-out
+            forwards;
+        }
+
+        .page-loaded .main-title {
+          animation:
+            titleAppear
+            0.9s
+            cubic-bezier(.2,.8,.2,1)
+            forwards;
+        }
+
+        .page-loaded .chhath-card {
+          animation:
+            cardAppear
+            0.8s
+            cubic-bezier(.2,.8,.2,1)
+            .15s
+            forwards;
+        }
+
+        .page-loaded .music-player {
+          animation:
+            playerAppear
+            0.8s
+            cubic-bezier(.2,.8,.2,1)
+            .3s
+            forwards;
+        }
+
+        .page-loaded .made-by {
+          animation:
+            fadeUp
+            0.7s
+            ease-out
+            .45s
+            forwards;
+        }
+
+        .page-loaded .suggestions-button {
+          animation:
+            fadeUp
+            0.7s
+            ease-out
+            .5s
+            forwards;
+        }
+
+        @keyframes fadeDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes titleAppear {
+          from {
+            opacity: 0;
+            transform:
+              translateY(16px)
+              scale(.97);
+          }
+
+          to {
+            opacity: 1;
+            transform:
+              translateY(0)
+              scale(1);
+          }
+        }
+
+        @keyframes cardAppear {
+          from {
+            opacity: 0;
+            transform:
+              translateY(18px)
+              scale(.96);
+          }
+
+          to {
+            opacity: 1;
+            transform:
+              translateY(0)
+              scale(1);
+          }
+        }
+
+        @keyframes playerAppear {
+          from {
+            opacity: 0;
+            transform:
+              translateX(-50%)
+              translateY(18px);
+          }
+
+          to {
+            opacity: 1;
+            transform:
+              translateX(-50%)
+              translateY(0);
+          }
+        }
+
+        /* =========================
+           PREMIUM GLASS
+        ========================= */
+
+        .glass-panel {
+          background:
+            linear-gradient(
+              145deg,
+              rgba(55,32,22,.72),
+              rgba(20,13,10,.55)
+            );
+
+          border:
+            1px solid
+            rgba(255,225,190,.20);
+
+          box-shadow:
+            0 14px 35px
+            rgba(0,0,0,.30),
+            inset 0 1px 0
+            rgba(255,255,255,.08);
+
+          backdrop-filter:
+            blur(16px)
+            saturate(120%);
+
+          -webkit-backdrop-filter:
+            blur(16px)
+            saturate(120%);
+        }
+
+        .glass-panel::after {
+          content: "";
+
+          display: block;
+
+          position: absolute;
+        }
+
+        .calendar-row {
+          background:
+            rgba(255,255,255,.075);
+
+          border:
+            1px solid
+            rgba(255,255,255,.055);
+
+          transition:
+            background
+            .2s
+            ease,
+            transform
+            .2s
+            ease;
+        }
+
+        .calendar-row:hover {
+          background:
+            rgba(255,255,255,.11);
+
+          transform:
+            translateX(-2px);
+        }
+
+        /* =========================
+           COUNTDOWN
+        ========================= */
+
+        .countdown-panel {
+          position: relative;
+
+          overflow: hidden;
+        }
+
+        .countdown-panel::before {
+          content: "";
+
+          position: absolute;
+
+          top: -45px;
+
+          right: -40px;
+
+          width: 110px;
+
+          height: 110px;
+
+          border-radius: 50%;
+
+          background:
+            rgba(255,185,90,.08);
+
+          filter: blur(20px);
+
+          pointer-events: none;
+        }
+
+        /* =========================
+           MUSIC PLAYER
+        ========================= */
+
+        .music-player {
+          background:
+            linear-gradient(
+              135deg,
+              rgba(48,26,19,.96),
+              rgba(25,15,11,.94)
+            );
+
+          border:
+            1px solid
+            rgba(255,255,255,.20);
+
+          box-shadow:
+            0 16px 45px
+            rgba(0,0,0,.42),
+            inset 0 1px 0
+            rgba(255,255,255,.08);
+
+          backdrop-filter:
+            blur(18px)
+            saturate(120%);
+
+          -webkit-backdrop-filter:
+            blur(18px)
+            saturate(120%);
+        }
+
+        /* =========================
+           COVER
+        ========================= */
+
+        .cover-wrap {
+          border:
+            2px solid
+            rgba(255,255,255,.72);
+
+          box-shadow:
+            0 4px 18px
+            rgba(0,0,0,.32);
+
+          transition:
+            transform
+            .3s
+            ease,
+            box-shadow
+            .3s
+            ease;
+        }
+
+        .cover-wrap.playing {
+          animation:
+            coverRotate
+            8s
+            linear
+            infinite;
+
+          box-shadow:
+            0 0 0 3px
+              rgba(255,255,255,.07),
+            0 5px 25px
+              rgba(0,0,0,.38);
+        }
+
+        @keyframes coverRotate {
+          from {
+            transform: rotate(0deg);
+          }
+
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        /* =========================
+           PLAY BUTTON
+        ========================= */
+
+        .play-button {
+          transition:
+            transform
+            .18s
+            ease,
+            box-shadow
+            .18s
+            ease;
+        }
+
+        .play-button:hover {
+          transform:
+            scale(1.06);
+        }
+
+        .play-button:active {
+          transform:
+            scale(.91);
+        }
+
+        .play-button.active {
+          box-shadow:
+            0 0 0 4px
+              rgba(255,255,255,.08);
+        }
+
+        .player-button {
+          transition:
+            transform
+            .18s
+            ease,
+            opacity
+            .18s
+            ease;
+        }
+
+        .player-button:hover {
+          transform:
+            scale(1.1);
+
+          opacity: .9;
+        }
+
+        .player-button:active {
+          transform:
+            scale(.88);
+        }
+
+        /* =========================
+           SUGGESTIONS
+        ========================= */
+
+        .suggestions-button {
+          background:
+            rgba(40,25,20,.70);
+
+          border:
+            1px solid
+            rgba(255,255,255,.18);
+
+          box-shadow:
+            0 7px 22px
+            rgba(0,0,0,.26);
+
+          backdrop-filter:
+            blur(10px);
+
+          -webkit-backdrop-filter:
+            blur(10px);
+
+          transition:
+            transform
+            .2s
+            ease,
+            background
+            .2s
+            ease;
+        }
+
+        .suggestions-button:hover {
+          transform:
+            translateY(-2px);
+
+          background:
+            rgba(50,30,23,.82);
+        }
+
+        /* =========================
+           AMBIENT GLOW
+        ========================= */
+
+        .ambient-glow {
+          position: fixed;
+
+          width: 170px;
+
+          height: 170px;
+
+          border-radius: 50%;
+
+          pointer-events: none;
+
+          z-index: 1;
+
+          opacity: .12;
+
+          filter: blur(55px);
+
+          background:
+            rgba(255,190,100,.45);
+        }
+
+        .glow-one {
+          top: 28%;
+
+          left: 12%;
+        }
+
+        .glow-two {
+          bottom: 25%;
+
+          right: 10%;
+
+          opacity: .09;
+        }
+
+        /* =========================
+           PARTICLES
+        ========================= */
+
+        .particles {
+          position: fixed;
+
+          inset: 0;
+
+          pointer-events: none;
+
+          overflow: hidden;
+
+          z-index: 1;
+        }
+
+        .particles span {
+          position: absolute;
+
+          width: 3px;
+
+          height: 3px;
+
+          border-radius: 50%;
+
+          background:
+            rgba(255,220,160,.5);
+
+          opacity: 0;
+
+          animation:
+            floatParticle
+            8s
+            linear
+            infinite;
+        }
+
+        .particles span:nth-child(1) {
+          left: 12%;
+          top: 72%;
+          animation-delay: 0s;
+        }
+
+        .particles span:nth-child(2) {
+          left: 28%;
+          top: 60%;
+          animation-delay: 2s;
+        }
+
+        .particles span:nth-child(3) {
+          left: 52%;
+          top: 78%;
+          animation-delay: 4s;
+        }
+
+        .particles span:nth-child(4) {
+          left: 68%;
+          top: 48%;
+          animation-delay: 1s;
+        }
+
+        .particles span:nth-child(5) {
+          left: 82%;
+          top: 68%;
+          animation-delay: 5s;
+        }
+
+        .particles span:nth-child(6) {
+          left: 42%;
+          top: 35%;
+          animation-delay: 3s;
+        }
+
+        @keyframes floatParticle {
+          0% {
+            opacity: 0;
+            transform:
+              translateY(15px)
+              scale(.7);
+          }
+
+          25% {
+            opacity: .5;
+          }
+
+          75% {
+            opacity: .3;
+          }
+
+          100% {
+            opacity: 0;
+            transform:
+              translateY(-55px)
+              scale(1);
+          }
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
         @media (max-width: 700px) {
           html,
           body {
@@ -1300,12 +1892,118 @@ export default function Home() {
           main {
             width: 100%;
             min-height: 100dvh;
+
+            /*
+             * Mobile background stays fully visible
+             * without normal cover cropping.
+             */
+            background-size: 100% 100% !important;
+
+            background-position:
+              center center !important;
+
+            background-repeat:
+              no-repeat !important;
+          }
+
+          .ambient-glow {
+            width: 110px;
+            height: 110px;
+            filter: blur(40px);
+            opacity: .08;
+          }
+
+          .particles span {
+            width: 2px;
+            height: 2px;
+          }
+
+          .glass-panel {
+            backdrop-filter:
+              blur(12px);
+
+            -webkit-backdrop-filter:
+              blur(12px);
+          }
+
+          .music-player {
+            gap: 3px;
+
+            /*
+             * Player stays above bottom controls.
+             */
+            bottom: 43px !important;
+          }
+
+          .made-by {
+            bottom: 9px !important;
+          }
+
+          .suggestions-button {
+            bottom: 8px !important;
           }
         }
 
+        /* =========================
+           VERY SMALL PHONES
+        ========================= */
+
         @media (max-width: 380px) {
           h1 {
-            padding-top: 65px !important;
+            padding-top:
+              65px !important;
+          }
+
+          .chhath-card {
+            width:
+              min(
+                205px,
+                calc(100vw - 10px)
+              ) !important;
+
+            margin-right: 5px !important;
+          }
+
+          .music-player {
+            width:
+              calc(100vw - 8px) !important;
+
+            padding: 4px !important;
+          }
+
+          .music-player .cover-wrap {
+            width: 37px !important;
+            height: 37px !important;
+            min-width: 37px !important;
+          }
+
+          .suggestions-button {
+            font-size: 7px !important;
+            padding:
+              6px 8px !important;
+          }
+
+          .made-by {
+            font-size: 6.5px !important;
+          }
+        }
+
+        /* =========================
+           REDUCE MOTION
+        ========================= */
+
+        @media (prefers-reduced-motion: reduce) {
+          *,
+          *::before,
+          *::after {
+            animation-duration:
+              .01ms !important;
+
+            animation-iteration-count:
+              1 !important;
+
+            transition-duration:
+              .01ms !important;
           }
         }
       `}</style>
@@ -1332,18 +2030,21 @@ function CountdownBox({
         textAlign: "center",
 
         padding: small
-          ? "3px 1px"
-          : "7px 3px",
+          ? "5px 2px"
+          : "8px 3px",
 
         borderRadius: small
-          ? "6px"
-          : "10px",
+          ? "8px"
+          : "11px",
 
         background:
-          "rgba(255,255,255,.10)",
+          "linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.055))",
 
         border:
-          "1px solid rgba(255,255,255,.10)",
+          "1px solid rgba(255,255,255,.11)",
+
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,.07)",
 
         minWidth: 0,
 
@@ -1353,14 +2054,17 @@ function CountdownBox({
       <div
         style={{
           fontSize: small
-            ? "12px"
-            : "20px",
+            ? "13px"
+            : "21px",
 
           lineHeight: 1,
 
           fontWeight: 900,
 
           whiteSpace: "nowrap",
+
+          textShadow:
+            "0 2px 10px rgba(0,0,0,.25)",
         }}
       >
         {String(value).padStart(
@@ -1371,13 +2075,13 @@ function CountdownBox({
 
       <div
         style={{
-          marginTop: "3px",
+          marginTop: "4px",
 
           fontSize: small
-            ? "4.5px"
+            ? "4.8px"
             : "8px",
 
-          opacity: 0.7,
+          opacity: 0.72,
 
           whiteSpace: "nowrap",
         }}
@@ -1416,4 +2120,7 @@ const buttonStyle = {
   alignItems: "center",
 
   justifyContent: "center",
+
+  WebkitTapHighlightColor:
+    "transparent",
 };
